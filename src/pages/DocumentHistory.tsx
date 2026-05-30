@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useFirebase } from '../context/FirebaseContext';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { motion } from 'motion/react';
-import { FileText, Download, Share2, Search, Clock } from 'lucide-react';
-import { generateDocumentPDF, downloadPDF, shareByWhatsApp } from '../lib/pdfGenerator';
+import { FileText, Download, Share2, Search, Clock, Mail } from 'lucide-react';
+import { generateDocumentPDF, downloadPDF, shareByWhatsApp, shareByEmail } from '../lib/pdfGenerator';
 import { handleFirestoreError, OperationType } from '../lib/firebaseUtils';
 
 interface Document {
@@ -79,6 +79,21 @@ export default function DocumentHistory() {
 
   const handleShare = (docData: Document) => {
     shareByWhatsApp({
+      type: docData.type,
+      number: docData.number,
+      date: new Date(docData.createdAt).toLocaleDateString(),
+      customer: {
+        name: docData.customerName,
+        email: docData.customerEmail,
+        phone: docData.customerPhone
+      },
+      items: docData.items,
+      total: docData.total
+    });
+  };
+
+  const handleShareEmail = (docData: Document) => {
+    shareByEmail({
       type: docData.type,
       number: docData.number,
       date: new Date(docData.createdAt).toLocaleDateString(),
@@ -171,6 +186,13 @@ export default function DocumentHistory() {
                       title="Descarregar PDF"
                     >
                       <Download size={18} />
+                    </button>
+                    <button 
+                      onClick={() => handleShareEmail(doc)}
+                      className="w-10 h-10 bg-gray-100 text-black rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"
+                      title="Enviar por E-mail"
+                    >
+                      <Mail size={18} />
                     </button>
                     <button 
                       onClick={() => handleShare(doc)}

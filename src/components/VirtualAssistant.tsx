@@ -192,15 +192,21 @@ export default function VirtualAssistant() {
     }
   };
 
-  const handleProformaRequest = (text: string) => {
+  const handleProformaRequest = async (text: string) => {
     const lowerText = text.toLowerCase();
-    // Captura variações: proforma, performa, pro forma, etc.
-    const isDocRequest = lowerText.includes('proforma') || 
-                        lowerText.includes('performa') || 
-                        lowerText.includes('pro forma') ||
-                        (lowerText.includes('fatura') && (lowerText.includes('faz') || lowerText.includes('gera')));
+    
+    let docTypeRequested = '';
+    if (lowerText.includes('proforma') || lowerText.includes('performa') || lowerText.includes('pro forma')) {
+      docTypeRequested = 'Fatura Proforma';
+    } else if (lowerText.includes('fatura') || lowerText.includes('factura')) {
+      docTypeRequested = 'Fatura';
+    } else if (lowerText.includes('recibo')) {
+      docTypeRequested = 'Recibo';
+    } else if (lowerText.includes('receita')) {
+      docTypeRequested = 'Receita Eletrónica';
+    }
 
-    if (!isDocRequest) return null;
+    if (!docTypeRequested) return null;
 
     // Tentar encontrar o produto mencionado
     const matchedProduct = products.find(p => lowerText.includes(p.name.toLowerCase()));
@@ -209,14 +215,15 @@ export default function VirtualAssistant() {
       if (!user) {
         setPendingProformaProduct(matchedProduct.name);
         return { 
-          text: `Com certeza! Posso gerar a proforma para o **${matchedProduct.name}**. \n\nPara que o documento seja válido, por favor escreva o seu **Nome Completo**, **Email** e **NIF** abaixo.`,
+          text: `Com certeza! Posso gerar o doc (${docTypeRequested}) para o **${matchedProduct.name}**. \n\nPara que o documento seja válido, por favor escreva o seu **Nome Completo**, **Email** e **NIF** abaixo.`,
           isLearned: false
         };
       }
 
+      const acronym = docTypeRequested === 'Fatura' ? 'FT' : docTypeRequested === 'Recibo' ? 'RC' : docTypeRequested === 'Receita Eletrónica' ? 'RE' : 'PRF';
       const docData = {
-        type: 'Fatura Proforma',
-        number: `PRF-${Math.floor(1000 + Math.random() * 9000)}-${new Date().getFullYear()}`,
+        type: docTypeRequested,
+        number: `${acronym}-${Math.floor(1000 + Math.random() * 9000)}-${new Date().getFullYear()}`,
         date: new Date().toLocaleDateString('pt-BR'),
         customer: {
           name: user?.displayName || 'Cliente Ministore',
@@ -232,15 +239,34 @@ export default function VirtualAssistant() {
         total: matchedProduct.numericPrice
       };
 
-      const doc = generateDocumentPDF(docData);
-      downloadPDF(doc, `Proforma_${matchedProduct.name.replace(/\s/g, '_')}.pdf`);
+      const docVal = generateDocumentPDF(docData);
+      downloadPDF(docVal, `${docTypeRequested.replace(/\s/g, '_')}_${matchedProduct.name.replace(/\s/g, '_')}.pdf`);
       
-      const response = `Com certeza! Acabei de gerar a **Fatura Proforma** para o **${matchedProduct.name}** com o preço oficial de **${matchedProduct.price}**. O download deve iniciar automaticamente.`;
+      // Save to document history
+      if (db && user) {
+        try {
+          await addDoc(collection(db, 'documents'), {
+            userId: user.uid,
+            type: docData.type,
+            number: docData.number,
+            customerName: docData.customer.name,
+            customerEmail: docData.customer.email,
+            customerPhone: docData.customer.phone,
+            items: docData.items,
+            total: docData.total,
+            createdAt: new Date().toISOString()
+          });
+        } catch (e) {
+          console.error("Failed to save proforma history:", e);
+        }
+      }
+
+      const response = `Com certeza! Acabei de gerar o/a **${docTypeRequested}** para o **${matchedProduct.name}** com o preço oficial de **${matchedProduct.price}**. O download deve iniciar automaticamente.`;
       return { text: response, isLearned: false, isAction: true };
     }
 
     return { 
-      text: "Gostaria de uma proforma, mas não identifiquei o nome do produto. Pode dizer, por exemplo: 'Gera uma proforma do iPhone 13'?",
+      text: `Gostaria de um(a) ${docTypeRequested}, mas não identifiquei o nome do produto. Pode dizer, por exemplo: 'Gera uma ${docTypeRequested} do iPhone 13'?`,
       isLearned: false
     };
   };
@@ -368,7 +394,7 @@ export default function VirtualAssistant() {
     }
 
     // 1. Verificar pedido de Proforma
-    const proformaResult = handleProformaRequest(messageText);
+    const proformaResult = await handleProformaRequest(messageText);
     if (proformaResult) {
       setTimeout(() => {
         const botMessage: ChatMessage = { 

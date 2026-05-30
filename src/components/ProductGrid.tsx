@@ -27,13 +27,13 @@ export default function ProductGrid({
   products, 
   linkText, 
   hideHeader = false,
-  columns = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5",
+  columns = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
   useFilters = false
 }: ProductGridProps) {
-  const { searchQuery, selectedCategory, selectedBrand, selectedTag } = useProductContext();
+  const { searchQuery, selectedCategory, selectedBrand, selectedTag, sortBy } = useProductContext();
   const { addToCart } = useCart();
 
-  const filteredProducts = useFilters ? products.filter(product => {
+  let filteredProducts = useFilters ? products.filter(product => {
     // Search filter
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -47,7 +47,17 @@ export default function ProductGrid({
     const matchesTag = selectedTag === 'Todas' || product.tags.includes(selectedTag);
 
     return matchesSearch && matchesCategory && matchesBrand && matchesTag;
-  }) : products;
+  }) : [...products];
+
+  if (useFilters && sortBy) {
+    filteredProducts = filteredProducts.sort((a, b) => {
+      if (sortBy === 'price-asc') return a.numericPrice - b.numericPrice;
+      if (sortBy === 'price-desc') return b.numericPrice - a.numericPrice;
+      if (sortBy === 'name-asc') return a.name.localeCompare(b.name);
+      if (sortBy === 'name-desc') return b.name.localeCompare(a.name);
+      return 0; // default / popularidade / novidades
+    });
+  }
 
   const handleQuickAdd = (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
@@ -81,11 +91,11 @@ export default function ProductGrid({
           <div className={`grid ${columns} gap-8`}>
             {filteredProducts.map((product) => (
               <div key={product.id} className="group relative">
-                <Link to={`/product/${product.id}`} className="aspect-[4/5] bg-[#F3F3F3] mb-6 overflow-hidden flex items-center justify-center p-8 transition-colors group-hover:bg-[#EAEAEA] block relative">
+                <Link to={`/product/${product.id}`} className="aspect-[4/5] bg-gray-50 mb-4 overflow-hidden block relative rounded-lg">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-contain mix-blend-multiply rounded-lg transform scale-100 group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-cover transform scale-100 group-hover:scale-110 transition-transform duration-500"
                   />
                   <button 
                     onClick={(e) => handleQuickAdd(e, product)}

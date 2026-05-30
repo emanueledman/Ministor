@@ -8,11 +8,13 @@ const categoriesList = [
   { label: 'Tudo', value: 'Tudo' },
   { label: 'Telemóveis', value: 'Phones' },
   { label: 'Relógios', value: 'Watches' },
+  { label: 'Computadores', value: 'Computers' },
+  { label: 'Material Informático', value: 'IT Materials' },
   { label: 'Acessórios', value: 'Accessories' }
 ];
 
-const tagsList = ['Branco', 'Barato', 'Móvel', 'Moderno'];
-const brandsList = ['Apple', 'Samsung', 'Sony', 'Nokia'];
+const tagsList = ['Branco', 'Barato', 'Móvel', 'Moderno', 'Clássico', 'Laptop', 'Prático', 'Gaming', 'Produtividade', 'Profissional', 'Teclado', 'Rato', 'Monitor', 'Hub', 'Apple', 'Samsung'];
+const brandsList = ['Apple', 'Samsung', 'Sony', 'Nokia', 'Asus', 'Dell', 'Logitech', 'LG'];
 
 export default function Shop() {
   const { 
@@ -24,6 +26,8 @@ export default function Shop() {
     setSelectedBrand,
     selectedTag,
     setSelectedTag,
+    sortBy,
+    setSortBy,
     clearFilters
   } = useProductContext();
 
@@ -52,11 +56,16 @@ export default function Shop() {
                 Filtros: {selectedCategory} / {selectedBrand} {searchQuery && `/ "${searchQuery}"`}
               </p>
               <div className="relative">
-                <select className="border border-gray-100 p-2 text-[11px] font-bold uppercase tracking-widest focus:outline-none bg-white appearance-none pr-10">
-                  <option>Ordenação padrão</option>
-                  <option>Popularidade</option>
-                  <option>Novidades</option>
-                  <option>Preço: Menor para Maior</option>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="border border-gray-100 p-2 text-[11px] font-bold uppercase tracking-widest focus:outline-none bg-white appearance-none pr-10"
+                >
+                  <option value="default">Ordenação padrão</option>
+                  <option value="name-asc">Nome: A - Z</option>
+                  <option value="name-desc">Nome: Z - A</option>
+                  <option value="price-asc">Preço: Menor para Maior</option>
+                  <option value="price-desc">Preço: Maior para Menor</option>
                 </select>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                   <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/></svg>

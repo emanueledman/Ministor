@@ -78,11 +78,11 @@ export default function ProductDetail() {
       <section className="container mx-auto px-4 py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Image */}
-          <div className="relative bg-[#f1f1f1] flex items-center justify-center p-12 overflow-hidden group">
+          <div className="relative bg-gray-50 flex items-center justify-center overflow-hidden group rounded-2xl aspect-square w-full lg:aspect-auto lg:h-[600px]">
             <img 
               src={product.image}
               alt={product.name}
-              className="w-full h-auto object-contain max-h-[600px] transition-transform duration-700 group-hover:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           </div>
 

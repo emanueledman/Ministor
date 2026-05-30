@@ -30,6 +30,8 @@ export default function Header() {
       'Telemóveis': 'Phones',
       'Relógios Inteligentes': 'Watches',
       'Acessórios': 'Accessories',
+      'Computadores': 'Computers',
+      'Material Informático': 'IT Materials'
     };
     setSelectedCategory(categoryMap[cat] || 'Tudo');
     setIsSearchOpen(false);
@@ -73,7 +75,7 @@ export default function Header() {
   ];
 
   const categoryDisplayList = [
-    "Telemóveis", "Relógios Inteligentes", "Auscultadores", "Acessórios", "Monitores", "Colunas", "Cartões de Memória"
+    "Telemóveis", "Relógios Inteligentes", "Computadores", "Material Informático", "Acessórios"
   ];
 
   return (

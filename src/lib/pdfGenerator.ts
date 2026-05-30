@@ -87,3 +87,10 @@ export const shareByWhatsApp = (data: DocData) => {
   const url = `https://wa.me/${data.customer.phone.replace(/\s/g, '')}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 };
+
+export const shareByEmail = (data: DocData) => {
+  const subject = `${data.type} - Ministore - ${data.number}`;
+  const body = `Olá ${data.customer.name},\n\nAqui está o resumo do seu documento:\nTipo: ${data.type}\nNúmero: ${data.number}\nTotal: ${data.total.toLocaleString()} Kz\n\nEste documento ficará disponível no seu histórico na plataforma Ministore, onde poderá descarregar o PDF a qualquer momento.\n\nObrigado pela preferência!\nMinistore`;
+  const url = `mailto:${data.customer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+};

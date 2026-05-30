@@ -9,6 +9,8 @@ interface ProductContextType {
   setSelectedBrand: (brand: string) => void;
   selectedTag: string;
   setSelectedTag: (tag: string) => void;
+  sortBy: string;
+  setSortBy: (sort: string) => void;
   clearFilters: () => void;
 }
 
@@ -19,12 +21,14 @@ export function ProductProvider({ children }: { children: ReactNode }) {
   const [selectedCategory, setSelectedCategory] = useState('Tudo');
   const [selectedBrand, setSelectedBrand] = useState('Todas');
   const [selectedTag, setSelectedTag] = useState('Todas');
+  const [sortBy, setSortBy] = useState('default');
 
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedCategory('Tudo');
     setSelectedBrand('Todas');
     setSelectedTag('Todas');
+    setSortBy('default');
   };
 
   return (
@@ -37,6 +41,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
       setSelectedBrand,
       selectedTag,
       setSelectedTag,
+      sortBy,
+      setSortBy,
       clearFilters
     }}>
       {children}

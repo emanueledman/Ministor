@@ -4,7 +4,7 @@ export interface Product {
   price: string;
   numericPrice: number;
   image: string;
-  category: 'Phones' | 'Watches' | 'Accessories';
+  category: 'Phones' | 'Watches' | 'Accessories' | 'Computers' | 'IT Materials';
   tags: string[];
   sku: string;
   description: string;
@@ -107,5 +107,149 @@ export const products: Product[] = [
     sku: 'WT-004',
     description: 'Minimalismo puro. O acabamento em preto profundo e o mostrador simples tornam este o companheiro perfeito para qualquer traje profissional.',
     rating: 4.8
+  },
+  {
+    id: '5',
+    name: 'iPhone 14 Pro',
+    price: '180.000 Kz',
+    numericPrice: 180000,
+    image: 'https://images.unsplash.com/photo-1678652197831-2d180705cd2c?q=80&w=800&auto=format&fit=crop',
+    category: 'Phones',
+    tags: ['Móvel', 'Apple', 'Moderno'],
+    sku: 'PH-005',
+    description: 'Pro além dos limites. Com a Ilha Dinâmica, uma nova forma mágica de interagir com o iPhone.',
+    rating: 4.8
+  },
+  {
+    id: '6',
+    name: 'iPhone 15 Pro Max',
+    price: '230.000 Kz',
+    numericPrice: 230000,
+    image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=800&auto=format&fit=crop',
+    category: 'Phones',
+    tags: ['Móvel', 'Apple', 'Moderno'],
+    sku: 'PH-006',
+    description: 'Titânio. Tão forte. Tão leve. Tão Pro. O maior e mais avançado ecrã num iPhone.',
+    rating: 5.0
+  },
+  {
+    id: '7',
+    name: 'Galaxy S23 Ultra',
+    price: '190.000 Kz',
+    numericPrice: 190000,
+    image: 'https://images.unsplash.com/photo-1678911820864-e2c567c655d7?q=80&w=800&auto=format&fit=crop',
+    category: 'Phones',
+    tags: ['Móvel', 'Samsung', 'Moderno'],
+    sku: 'PH-007',
+    description: 'O desempenho mais épico da Samsung num smartphone, com câmara de alta resolução e S Pen incluída.',
+    rating: 4.9
+  },
+  {
+    id: 'a1',
+    name: 'AirPods Pro 2',
+    price: '45.000 Kz',
+    numericPrice: 45000,
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?q=80&w=800&auto=format&fit=crop',
+    category: 'Accessories',
+    tags: ['Fone', 'Apple', 'Moderno'],
+    sku: 'AC-001',
+    description: 'Cancelamento ativo de ruído até 2x melhor, Transparência Adaptativa e Áudio Espacial Personalizado.',
+    rating: 4.9
+  },
+  {
+    id: 'w5',
+    name: 'Apple Watch Ultra',
+    price: '120.000 Kz',
+    numericPrice: 120000,
+    image: 'https://images.unsplash.com/photo-1696446702334-a2c686735e07?q=80&w=800&auto=format&fit=crop',
+    category: 'Watches',
+    tags: ['Relógio', 'Apple', 'Moderno'],
+    sku: 'WT-005',
+    description: 'O Apple Watch mais robusto e capaz. Construído para a exploração, aventura e resiliência.',
+    rating: 4.9
+  },
+  {
+    id: 'c1',
+    name: 'MacBook Pro 16"',
+    price: '950.000 Kz',
+    numericPrice: 950000,
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop',
+    category: 'Computers',
+    tags: ['Laptop', 'Apple', 'Profissional'],
+    sku: 'CP-001',
+    description: 'O MacBook Pro redefine o desempenho com os processadores M2 Pro e M2 Max, bateria de longa duração e ecrã Liquid Retina XDR.',
+    rating: 5.0
+  },
+  {
+    id: 'c2',
+    name: 'Dell XPS 15',
+    price: '850.000 Kz',
+    numericPrice: 850000,
+    image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=800&auto=format&fit=crop',
+    category: 'Computers',
+    tags: ['Laptop', 'Dell', 'Moderno'],
+    sku: 'CP-002',
+    description: 'O Dell XPS 15 combina elegância e potência, ideal para criadores de conteúdo e profissionais exigentes.',
+    rating: 4.8
+  },
+  {
+    id: 'c3',
+    name: 'Asus ROG Strix',
+    price: '1.200.000 Kz',
+    numericPrice: 1200000,
+    image: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?q=80&w=800&auto=format&fit=crop',
+    category: 'Computers',
+    tags: ['Laptop', 'Asus', 'Gaming'],
+    sku: 'CP-003',
+    description: 'Para os jogadores mais sérios. Gráficos incríveis, ecrã de alta taxa de atualização e refrigeração avançada.',
+    rating: 4.9
+  },
+  {
+    id: 'it1',
+    name: 'Teclado Mecânico Logitech G Pro X',
+    price: '85.000 Kz',
+    numericPrice: 85000,
+    image: 'https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=800&auto=format&fit=crop',
+    category: 'IT Materials',
+    tags: ['Teclado', 'Logitech', 'Gaming'],
+    sku: 'IT-001',
+    description: 'Teclado mecânico de nível profissional. Interruptores substituíveis para uma personalização máxima.',
+    rating: 4.7
+  },
+  {
+    id: 'it2',
+    name: 'Rato Sem Fios MX Master 3',
+    price: '70.000 Kz',
+    numericPrice: 70000,
+    image: 'https://images.unsplash.com/photo-1527864550417-7fd11b645b21?q=80&w=800&auto=format&fit=crop',
+    category: 'IT Materials',
+    tags: ['Rato', 'Logitech', 'Produtividade'],
+    sku: 'IT-002',
+    description: 'A ferramenta perfeita para criadores e programadores. Precisão milimétrica e formato ergonómico.',
+    rating: 4.9
+  },
+  {
+    id: 'it3',
+    name: 'Monitor UltraWide LG 34"',
+    price: '250.000 Kz',
+    numericPrice: 250000,
+    image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?q=80&w=800&auto=format&fit=crop',
+    category: 'IT Materials',
+    tags: ['Monitor', 'LG', 'Produtividade'],
+    sku: 'IT-003',
+    description: 'Mais espaço para as suas ideias. Este monitor UltraWide oferece um campo de visão expandido perfeito para multitasking.',
+    rating: 4.8
+  },
+  {
+    id: 'a2',
+    name: 'Hub USB-C 8-em-1',
+    price: '25.000 Kz',
+    numericPrice: 25000,
+    image: 'https://plus.unsplash.com/premium_photo-1678129712799-7ee466d69e46?q=80&w=800&auto=format&fit=crop',
+    category: 'Accessories',
+    tags: ['Cabo', 'Hub', 'Prático'],
+    sku: 'AC-002',
+    description: 'Expanda as conectividades do seu laptop. Inclui portas USB, HDMI 4K, leitor de cartões e muito mais.',
+    rating: 4.5
   }
 ];

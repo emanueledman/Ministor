@@ -13,8 +13,10 @@ import Subscribe from '../components/Subscribe';
 import { products } from '../data/products';
 
 export default function Home() {
-  const mobileProducts = products.filter(p => p.category === 'Phones').slice(0, 5);
-  const watchProducts = products.filter(p => p.category === 'Watches').slice(0, 5);
+  const mobileProducts = products.filter(p => p.category === 'Phones').slice(0, 4);
+  const watchProducts = products.filter(p => p.category === 'Watches').slice(0, 4);
+  const computerProducts = products.filter(p => p.category === 'Computers').slice(0, 4);
+  const itProducts = products.filter(p => p.category === 'IT Materials').slice(0, 4);
 
   return (
     <>
@@ -23,17 +25,37 @@ export default function Home() {
       
       <section id="mobile-products">
         <ProductGrid 
-          title="Produtos Móveis" 
+          title="Telemóveis" 
           products={mobileProducts} 
-          linkText="Ir para a Loja" 
+          linkText="Ver Todos" 
+          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
         />
       </section>
       
+      <section id="computers">
+        <ProductGrid 
+          title="Computadores" 
+          products={computerProducts} 
+          linkText="Ver Todos" 
+          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        />
+      </section>
+
       <section id="smart-watches">
         <ProductGrid 
           title="Relógios Inteligentes" 
           products={watchProducts} 
-          linkText="Ir para a Loja" 
+          linkText="Ver Todos" 
+          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+        />
+      </section>
+
+      <section id="it-materials">
+        <ProductGrid 
+          title="Material Informático" 
+          products={itProducts} 
+          linkText="Ver Todos" 
+          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
         />
       </section>
       

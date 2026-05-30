@@ -11,14 +11,14 @@ const slides = [
     id: "4",
     title: "Seus Produtos São Excelentes.",
     subtitle: "Truques tecnológicos que você não terá",
-    image: "https://images.unsplash.com/photo-1546868889-4e0ca9994bb0?q=80&w=2000&auto=format&fit=crop",
+    image: "https://demo.templatesjungle.com/ministore/images/product-item1.jpg",
     linkText: "Comprar Produto"
   },
   {
     id: "w1",
     title: "O Truque Tecnológico Que Você Não Terá.",
     subtitle: "Novos Relógios Inteligentes",
-    image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?q=80&w=2000&auto=format&fit=crop",
+    image: "https://demo.templatesjungle.com/ministore/images/banner-image.png",
     linkText: "Comprar Produto"
   }
 ];

@@ -23,7 +23,7 @@ export default function Banner() {
         
         <div className="hidden lg:block absolute right-0 top-0 w-1/2 h-full">
            <img 
-            src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=2000&auto=format&fit=crop" 
+            src="https://demo.templatesjungle.com/ministore/images/single-image1.png" 
             alt="New Year Sale" 
             className="w-full h-full object-cover grayscale opacity-80"
            />

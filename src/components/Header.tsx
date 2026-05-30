@@ -82,34 +82,34 @@ export default function Header() {
     <>
       {/* Search Popup */}
       {isSearchOpen && (
-        <div className="fixed inset-0 bg-white z-[100] flex items-center justify-center animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-white z-[100] flex items-center justify-center animate-in fade-in duration-300 overflow-y-auto">
           <button 
             onClick={() => setIsSearchOpen(false)}
-            className="absolute top-10 right-10 text-black hover:text-gray-500 transition-colors"
+            className="absolute top-4 sm:top-10 right-4 sm:right-10 text-black hover:text-gray-500 transition-colors"
           >
-            <svg className="w-10 h-10"><use xlinkHref="#close"></use></svg>
+            <svg className="w-8 sm:w-10 h-8 sm:h-10"><use xlinkHref="#close"></use></svg>
           </button>
-          <div className="container max-w-2xl px-4 text-center">
-            <form onSubmit={handleSearchSubmit} className="relative border-b-2 border-black mb-12">
+          <div className="container max-w-2xl px-4 py-12 sm:py-0 text-center">
+            <form onSubmit={handleSearchSubmit} className="relative border-b-2 border-black mb-8 sm:mb-12">
               <input 
                 autoFocus
                 type="search" 
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
                 placeholder="Digite e pressione enter" 
-                className="w-full py-4 px-2 text-2xl font-light focus:outline-none placeholder:text-gray-300 uppercase tracking-widest"
+                className="w-full py-2 sm:py-4 px-2 text-lg sm:text-2xl font-light focus:outline-none placeholder:text-gray-300 uppercase tracking-widest"
               />
-              <button type="submit" className="absolute right-0 bottom-4">
-                <svg className="w-6 h-6"><use xlinkHref="#search"></use></svg>
+              <button type="submit" className="absolute right-0 bottom-2 sm:bottom-4">
+                <svg className="w-5 sm:w-6 h-5 sm:h-6"><use xlinkHref="#search"></use></svg>
               </button>
             </form>
-            <h5 className="text-sm font-bold uppercase tracking-[0.3em] mb-6">Navegar por Categorias</h5>
-            <ul className="flex flex-wrap justify-center gap-6">
+            <h5 className="text-xs sm:text-sm font-bold uppercase tracking-[0.3em] mb-4 sm:mb-6">Navegar por Categorias</h5>
+            <ul className="flex flex-wrap justify-center gap-3 sm:gap-6">
               {categoryDisplayList.map((cat) => (
                 <li key={cat}>
                   <button 
                     onClick={() => handleCategoryClick(cat)}
-                    className="text-gray-500 hover:text-black uppercase tracking-widest text-xs transition-colors"
+                    className="text-gray-500 hover:text-black uppercase tracking-widest text-[10px] sm:text-xs transition-colors"
                   >
                     {cat}
                   </button>
@@ -121,10 +121,10 @@ export default function Header() {
       )}
 
       <header id="header" className="fixed top-0 left-0 w-full bg-light border-b border-gray-100 z-50">
-        <nav className="container mx-auto px-4 py-4 md:py-6">
+        <nav className="container mx-auto px-3 sm:px-4 py-3 md:py-6">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link to="/" className="text-2xl font-bold tracking-tighter uppercase shrink-0">
+            <Link to="/" className="text-xl sm:text-2xl font-bold tracking-tighter uppercase shrink-0">
               <span className="text-black">Mini</span>
               <span className="text-gray-400 font-light">Store</span>
             </Link>
@@ -152,15 +152,15 @@ export default function Header() {
             </ul>
 
             {/* Utility Icons */}
-            <div className="flex items-center space-x-6">
-              <button onClick={() => setIsSearchOpen(true)} className="text-black hover:text-gray-500 transition-colors">
+            <div className="flex items-center space-x-3 sm:space-x-6">
+              <button onClick={() => setIsSearchOpen(true)} className="text-black hover:text-gray-500 transition-colors hidden sm:block">
                 <svg className="w-5 h-5"><use xlinkHref="#search"></use></svg>
               </button>
               
               {user ? (
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center gap-2 group"
+                  className="flex items-center gap-2 group hidden sm:flex"
                   title="Sair"
                 >
                   <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 group-hover:border-black transition-colors">
@@ -171,7 +171,7 @@ export default function Header() {
                 <button 
                   onClick={handleLogin}
                   disabled={isLoggingIn}
-                  className={`text-black hover:text-gray-500 transition-colors ${isLoggingIn ? 'opacity-50 cursor-wait' : ''}`}
+                  className={`text-black hover:text-gray-500 transition-colors hidden sm:block ${isLoggingIn ? 'opacity-50 cursor-wait' : ''}`}
                   title="Entrar com Google"
                 >
                   {isLoggingIn ? (
@@ -185,7 +185,7 @@ export default function Header() {
               <Link to="/cart" className="text-black hover:text-gray-500 transition-colors relative group">
                 <svg className="w-5 h-5"><use xlinkHref="#cart"></use></svg>
                 {totalItems > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center group-hover:bg-[#72aec8] transition-colors">
+                  <span className="absolute -top-2 -right-2 bg-black text-white text-[8px] sm:text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center group-hover:bg-[#72aec8] transition-colors">
                     {totalItems}
                   </span>
                 )}
@@ -202,7 +202,13 @@ export default function Header() {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden mt-4 pt-4 border-t border-gray-100 flex flex-col space-y-4 animate-in slide-in-from-top duration-300">
+            <div className="lg:hidden mt-3 pt-4 border-t border-gray-100 flex flex-col space-y-3 animate-in slide-in-from-top duration-300">
+              <button 
+                onClick={() => {setIsSearchOpen(true); setIsMenuOpen(false);}}
+                className="sm:hidden text-left text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
+              >
+                Pesquisar
+              </button>
               {navItems.map((item) => (
                 <Link 
                   key={item.label} 
@@ -213,6 +219,14 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
+              {!user && (
+                <button 
+                  onClick={() => {handleLogin(); setIsMenuOpen(false);}}
+                  className="sm:hidden text-left text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black transition-colors"
+                >
+                  Entrar com Google
+                </button>
+              )}
               <a 
                 href="#" 
                 className="inline-block px-6 py-2 border border-black rounded-full text-[10px] font-bold uppercase tracking-widest text-center"

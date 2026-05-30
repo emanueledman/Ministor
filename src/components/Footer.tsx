@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer id="footer" className="overflow-hidden bg-white pt-24">
+    <footer id="footer" className="overflow-hidden bg-white pt-12 md:pt-24">
       <div className="container mx-auto px-4">
-        <div className="row flex flex-wrap justify-between border-b pb-12 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 border-b pb-8 md:pb-12 mb-8 md:mb-12">
           <div className="col-lg-3 col-sm-6 w-full lg:w-1/4 pb-3 pr-8">
             <div className="footer-menu">
               <Link to="/" className="text-2xl font-bold tracking-tighter uppercase mb-6 block">
@@ -26,7 +26,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="col-lg-2 col-sm-6 w-1/2 lg:w-1/6 pb-3">
+          <div className="col-lg-2 col-sm-6 w-full sm:w-1/2">
             <div className="footer-menu uppercase">
               <h5 className="text-sm font-bold pb-6 tracking-widest">Links Rápidos</h5>
               <ul className="menu-list space-y-4 text-[10px] tracking-widest text-gray-500 font-bold">
@@ -39,7 +39,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="col-lg-3 col-sm-6 w-1/2 lg:w-1/4 pb-3">
+          <div className="col-lg-3 col-sm-6 w-full sm:w-1/2">
             <div className="footer-menu uppercase">
               <h5 className="text-sm font-bold pb-6 tracking-widest">Ajuda & Informação</h5>
               <ul className="menu-list space-y-4 text-[10px] tracking-widest text-gray-500 font-bold">
@@ -52,7 +52,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="col-lg-3 col-sm-6 w-full lg:w-1/4 pb-3">
+          <div className="col-lg-3 col-sm-6 w-full">
             <div className="footer-menu contact-item">
               <h5 className="text-sm font-bold pb-6 tracking-widest uppercase">Contacte-nos</h5>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">
@@ -67,23 +67,23 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center py-10 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-           <div className="flex items-center space-x-4 mb-4 md:mb-0">
+        <div className="flex flex-col gap-4 md:gap-0 md:flex-row justify-between items-center py-8 md:py-10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400">
+           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
              <p>Enviamos com:</p>
              <div className="flex space-x-2 grayscale opacity-50">
-                <span className="bg-gray-100 px-2 py-1">DHL</span>
-                <span className="bg-gray-100 px-2 py-1">UPS</span>
+                <span className="bg-gray-100 px-2 py-1 text-[8px]">DHL</span>
+                <span className="bg-gray-100 px-2 py-1 text-[8px]">UPS</span>
              </div>
            </div>
-           <div className="flex items-center space-x-4 mb-4 md:mb-0">
+           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
              <p>Opções de pagamento:</p>
              <div className="flex space-x-2 grayscale opacity-50">
-                <span className="bg-gray-100 px-2 py-1">Visa</span>
-                <span className="bg-gray-100 px-2 py-1">Mastercard</span>
-                <span className="bg-gray-100 px-2 py-1">Paypal</span>
+                <span className="bg-gray-100 px-2 py-1 text-[8px]">Visa</span>
+                <span className="bg-gray-100 px-2 py-1 text-[8px]">Mastercard</span>
+                <span className="bg-gray-100 px-2 py-1 text-[8px]">Paypal</span>
              </div>
            </div>
-           <p>© Copyright 2023 MiniStore. Design por TemplatesJungle</p>
+           <p className="text-center">© Copyright 2023 MiniStore. Design por TemplatesJungle</p>
         </div>
       </div>
     </footer>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 export default function Banner() {
   return (
-    <section id="yearly-sale" className="relative w-full h-[400px] md:h-[600px] bg-light-blue overflow-hidden">
+    <section id="yearly-sale" className="relative w-full h-[300px] md:h-[500px] lg:h-[600px] bg-light-blue overflow-hidden">
       <div className="container mx-auto px-4 h-full flex items-center">
         <div className="w-full md:w-1/2 z-10 flex flex-col items-center md:items-start text-center md:text-left">
           <motion.div
@@ -11,11 +11,11 @@ export default function Banner() {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h3 className="text-black text-xl uppercase tracking-[0.3em] block mb-4">10% de Desconto</h3>
-            <h2 className="text-6xl md:text-8xl font-light tracking-tight mb-10 uppercase leading-none text-black">
+            <h3 className="text-black text-sm md:text-lg uppercase tracking-[0.3em] block mb-2 md:mb-4">10% de Desconto</h3>
+            <h2 className="text-4xl md:text-6xl lg:text-8xl font-light tracking-tight mb-6 md:mb-10 uppercase leading-none text-black">
               Venda de <br /> <span className="font-bold">ano novo</span>
             </h2>
-            <Link to="/shop" className="btn-medium btn-dark inline-block">
+            <Link to="/shop" className="btn-medium btn-dark inline-block text-xs md:text-sm">
               Comprar Promoção
             </Link>
           </motion.div>

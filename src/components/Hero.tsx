@@ -25,7 +25,7 @@ const slides = [
 
 export default function Hero() {
   return (
-    <section id="billboard" className="relative w-full bg-light-blue pt-32 pb-20 md:py-40">
+    <section id="billboard" className="relative w-full bg-light-blue pt-16 pb-12 md:pt-40 md:pb-20">
       <Swiper
         modules={[Pagination, Autoplay, Navigation]}
         pagination={{ clickable: true }}
@@ -38,19 +38,19 @@ export default function Hero() {
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12">
               <div className="w-full md:w-1/2">
                 <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  <h1 className="text-5xl md:text-8xl font-light tracking-tight text-black mb-8 leading-[1.1] uppercase">
+                  <h1 className="text-4xl md:text-7xl lg:text-8xl font-light tracking-tight text-black mb-6 md:mb-8 leading-[1.1] uppercase">
                     {slide.title}
                   </h1>
                   <Link
                     to={`/product/${slide.id}`}
-                    className="btn-medium btn-dark inline-block"
+                    className="btn-medium btn-dark inline-block text-sm md:text-base"
                   >
                     {slide.linkText}
                   </Link>
@@ -63,7 +63,7 @@ export default function Hero() {
                   transition={{ duration: 0.8 }}
                   src={slide.image} 
                   alt={slide.title}
-                  className="max-h-[400px] md:max-h-[500px] object-contain drop-shadow-2xl"
+                  className="max-h-[250px] md:max-h-[400px] lg:max-h-[500px] w-full object-contain drop-shadow-2xl"
                  />
               </div>
             </div>
@@ -72,11 +72,11 @@ export default function Hero() {
       </Swiper>
 
       {/* Custom Arrows */}
-      <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 left-10 z-10 cursor-pointer swiper-arrow-prev opacity-30 hover:opacity-100 transition-opacity">
-        <svg className="w-10 h-10"><use xlinkHref="#chevron-left"></use></svg>
+      <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 left-4 md:left-10 z-10 cursor-pointer swiper-arrow-prev opacity-30 hover:opacity-100 transition-opacity">
+        <svg className="w-8 md:w-10 h-8 md:h-10"><use xlinkHref="#chevron-left"></use></svg>
       </div>
-      <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-10 z-10 cursor-pointer swiper-arrow-next opacity-30 hover:opacity-100 transition-opacity">
-        <svg className="w-10 h-10"><use xlinkHref="#chevron-right"></use></svg>
+      <div className="hidden lg:block absolute top-1/2 -translate-y-1/2 right-4 md:right-10 z-10 cursor-pointer swiper-arrow-next opacity-30 hover:opacity-100 transition-opacity">
+        <svg className="w-8 md:w-10 h-8 md:h-10"><use xlinkHref="#chevron-right"></use></svg>
       </div>
     </section>
   );

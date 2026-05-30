@@ -26,7 +26,7 @@ export default function App() {
       <FirebaseProvider>
         <ProductProvider>
         <CartProvider>
-          <div className="min-h-screen bg-white font-sans text-black selection:bg-black selection:text-white scroll-smooth pt-20">
+          <div className="min-h-screen bg-white font-sans text-black selection:bg-black selection:text-white scroll-smooth pt-16 md:pt-20">
           <Symbols />
           <Header />
           <main>

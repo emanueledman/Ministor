@@ -106,11 +106,11 @@ export default function ProductGrid({
                   </button>
                 </Link>
 
-                <div className="flex justify-between items-center px-1">
-                  <h3 className="text-sm font-medium uppercase tracking-widest text-[#212529]">
-                    <Link to={`/product/${product.id}`} className="hover:text-gray-500">{product.name}</Link>
+                <div className=\"flex flex-col gap-1 px-1\">
+                  <h3 className=\"text-xs md:text-sm font-medium uppercase tracking-widest text-[#212529] line-clamp-2\">
+                    <Link to={`/product/${product.id}`} className=\"hover:text-gray-500\">{product.name}</Link>
                   </h3>
-                  <span className="text-sm font-bold text-[#72aec8]">{product.price}</span>
+                  <span className=\"text-xs md:text-sm font-bold text-[#72aec8]\">{product.price}</span>
                 </div>
               </div>
             ))}

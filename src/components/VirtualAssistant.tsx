@@ -10,6 +10,7 @@ interface ChatMessage {
   role: 'user' | 'model';
   parts: [{ text: string }];
   isAction?: boolean;
+  isLearned?: boolean;
 }
 
 export default function VirtualAssistant() {
@@ -22,6 +23,7 @@ export default function VirtualAssistant() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [speechEnabled, setSpeechEnabled] = useState(true);
   const [dynamicKnowledge, setDynamicKnowledge] = useState<{question: string, answer: string, category?: string}[]>([]);
+  const [isLearning, setIsLearning] = useState(false);
   
   const { db } = useFirebase();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -67,6 +69,9 @@ export default function VirtualAssistant() {
         const snapshot = await getDocs(q);
         const docs = snapshot.docs.map(doc => doc.data() as any);
         setDynamicKnowledge(docs);
+        
+        // Trigger auto-learning analysis
+        runAutoLearning();
       } catch (error) {
         console.error('Error loading dynamic knowledge:', error);
       }
@@ -74,17 +79,90 @@ export default function VirtualAssistant() {
     loadKnowledge();
   }, [db]);
 
+  const runAutoLearning = async () => {
+    if (!db || isLearning) return;
+    setIsLearning(true);
+    
+    try {
+      // 1. Buscar logs recentes do tipo 'ai_fallback' (onde a base local falhou)
+      const logsQuery = query(
+        collection(db, 'chat_logs'), 
+        where('category', '==', 'ai_fallback'),
+        orderBy('timestamp', 'desc'),
+        limit(50)
+      );
+      const snapshot = await getDocs(logsQuery);
+      const logs = snapshot.docs.map(doc => doc.data().question.toLowerCase().trim());
+
+      if (logs.length < 5) {
+        setIsLearning(false);
+        return;
+      }
+
+      // 2. Identificar padrões (perguntas frequentes)
+      const frequencyMap: Record<string, number> = {};
+      logs.forEach(msg => {
+        frequencyMap[msg] = (frequencyMap[msg] || 0) + 1;
+      });
+
+      // Encontrar a pergunta mais frequente que ainda não está no conhecimento dinâmico
+      const commonQuestions = Object.entries(frequencyMap)
+        .filter(([q, count]) => count >= 2) // Pelo menos 2 ocorrências
+        .sort((a, b) => b[1] - a[1]);
+
+      for (const [question] of commonQuestions) {
+        const alreadyKnown = dynamicKnowledge.some(k => k.question.toLowerCase() === question) ||
+                             KNOWLEDGE_BASE.some(k => k.keywords.some(kw => question.includes(kw)));
+        
+        if (!alreadyKnown) {
+          // 3. Propor/Gerar resposta inteligente via Gemini para esta pergunta frequente
+          console.log('🤖 Auto-Learning: Pattern detected!', question);
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: `Crie uma resposta curta, oficial e definitiva (FAQ) para esta pergunta frequente dos clientes da Ministore: "${question}". Responda apenas com o texto da resposta.`,
+              history: [],
+              userId: 'system-learning'
+            }),
+          });
+          
+          const data = await response.json();
+          if (data.text) {
+            // 4. Salvar na base de conhecimento dinâmica
+            await addDoc(collection(db, 'dynamic_knowledge'), {
+              question: question,
+              answer: data.text,
+              category: 'learned_pattern',
+              timestamp: serverTimestamp()
+            });
+            console.log('✅ Auto-Learning: Knowledge Base Updated with:', question);
+            
+            // Atualizar estado local para consulta imediata
+            setDynamicKnowledge(prev => [{ question, answer: data.text, category: 'learned_pattern' }, ...prev]);
+            break; // Aprender uma de cada vez para evitar spam
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Auto-learning error:', error);
+    } finally {
+      setIsLearning(false);
+    }
+  };
+
   const findLocalAnswer = (text: string) => {
     const lowerText = text.toLowerCase();
     
     // 1. Verificar Conhecimento Aprendido primeiro (Dinâmico)
     const dynamicMatch = dynamicKnowledge.find(k => lowerText.includes(k.question.toLowerCase()));
-    if (dynamicMatch) return dynamicMatch.answer;
+    if (dynamicMatch) return { text: dynamicMatch.answer, isLearned: true };
 
     // 2. Verificar Base de Conhecimento Estática
-    return KNOWLEDGE_BASE.find(faq => 
+    const localMatch = KNOWLEDGE_BASE.find(faq => 
       faq.keywords.some(keyword => lowerText.includes(keyword))
-    )?.answer;
+    );
+    return localMatch ? { text: localMatch.answer, isLearned: false } : null;
   };
 
   const logInteraction = async (question: string, answer: string, category: string = 'general') => {
@@ -116,7 +194,13 @@ export default function VirtualAssistant() {
 
   const handleProformaRequest = (text: string) => {
     const lowerText = text.toLowerCase();
-    if (!lowerText.includes('proforma')) return null;
+    // Captura variações: proforma, performa, pro forma, etc.
+    const isDocRequest = lowerText.includes('proforma') || 
+                        lowerText.includes('performa') || 
+                        lowerText.includes('pro forma') ||
+                        (lowerText.includes('fatura') && (lowerText.includes('faz') || lowerText.includes('gera')));
+
+    if (!isDocRequest) return null;
 
     // Tentar encontrar o produto mencionado
     const matchedProduct = products.find(p => lowerText.includes(p.name.toLowerCase()));
@@ -124,7 +208,10 @@ export default function VirtualAssistant() {
     if (matchedProduct) {
       if (!user) {
         setPendingProformaProduct(matchedProduct.name);
-        return `Com certeza! Posso gerar a proforma para o **${matchedProduct.name}**. \n\nPara que o documento seja válido, por favor escreva o seu **Nome Completo**, **Email** e **NIF** abaixo.`;
+        return { 
+          text: `Com certeza! Posso gerar a proforma para o **${matchedProduct.name}**. \n\nPara que o documento seja válido, por favor escreva o seu **Nome Completo**, **Email** e **NIF** abaixo.`,
+          isLearned: false
+        };
       }
 
       const docData = {
@@ -148,10 +235,14 @@ export default function VirtualAssistant() {
       const doc = generateDocumentPDF(docData);
       downloadPDF(doc, `Proforma_${matchedProduct.name.replace(/\s/g, '_')}.pdf`);
       
-      return `Com certeza! Acabei de gerar a **Fatura Proforma** para o **${matchedProduct.name}** com o preço oficial de **${matchedProduct.price}**. O download deve iniciar automaticamente.`;
+      const response = `Com certeza! Acabei de gerar a **Fatura Proforma** para o **${matchedProduct.name}** com o preço oficial de **${matchedProduct.price}**. O download deve iniciar automaticamente.`;
+      return { text: response, isLearned: false, isAction: true };
     }
 
-    return "Gostaria de uma proforma, mas não identifiquei o nome do produto. Pode dizer, por exemplo: 'Gera uma proforma do iPhone 13'?";
+    return { 
+      text: "Gostaria de uma proforma, mas não identifiquei o nome do produto. Pode dizer, por exemplo: 'Gera uma proforma do iPhone 13'?",
+      isLearned: false
+    };
   };
 
   const generateManualProforma = (productName: string, userData: string) => {
@@ -277,32 +368,37 @@ export default function VirtualAssistant() {
     }
 
     // 1. Verificar pedido de Proforma
-    const proformaResponse = handleProformaRequest(messageText);
-    if (proformaResponse) {
+    const proformaResult = handleProformaRequest(messageText);
+    if (proformaResult) {
       setTimeout(() => {
         const botMessage: ChatMessage = { 
           role: 'model', 
-          parts: [{ text: proformaResponse }],
-          isAction: true 
+          parts: [{ text: proformaResult.text }],
+          isAction: proformaResult.isAction,
+          isLearned: proformaResult.isLearned
         };
         setMessages(prev => [...prev, botMessage]);
-        speak(proformaResponse);
+        speak(proformaResult.text);
         setIsLoading(false);
-        logInteraction(messageText, proformaResponse, 'proforma');
+        logInteraction(messageText, proformaResult.text, 'proforma');
       }, 800);
       return;
     }
 
     // 2. Verificar na Base de Conhecimento Local
-    const localAnswer = findLocalAnswer(messageText);
-    if (localAnswer) {
+    const localResult = findLocalAnswer(messageText);
+    if (localResult) {
       // Pequeno delay para simular processamento e não ser instantâneo demais
       setTimeout(() => {
-        const botMessage: ChatMessage = { role: 'model', parts: [{ text: localAnswer }] };
+        const botMessage: ChatMessage = { 
+          role: 'model', 
+          parts: [{ text: localResult.text }],
+          isLearned: localResult.isLearned
+        };
         setMessages(prev => [...prev, botMessage]);
-        speak(localAnswer);
+        speak(localResult.text);
         setIsLoading(false);
-        logInteraction(messageText, localAnswer, 'local_faq');
+        logInteraction(messageText, localResult.text, localResult.isLearned ? 'dynamic_faq' : 'local_faq');
       }, 500);
       return;
     }
@@ -412,6 +508,12 @@ export default function VirtualAssistant() {
                       : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm'
                   }`}>
                     <div className="whitespace-pre-wrap">{msg.parts[0].text}</div>
+                    {msg.isLearned && (
+                      <div className="flex items-center gap-1 mt-1 p-1 bg-blue-50/50 rounded-md text-[9px] text-blue-600 font-bold uppercase tracking-tight">
+                        <Sparkles size={10} />
+                        Conhecimento Aprendido
+                      </div>
+                    )}
                     {msg.isAction && (
                       <div className="flex items-center gap-2 mt-1 p-2 bg-gray-50 rounded-lg text-[10px] text-gray-500 font-bold uppercase tracking-tight">
                         <FileText size={14} className="text-[#72aec8]" />

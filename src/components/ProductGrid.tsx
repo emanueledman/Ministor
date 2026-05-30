@@ -19,6 +19,7 @@ interface ProductGridProps {
   linkText?: string;
   hideHeader?: boolean;
   columns?: string;
+  initialVisible?: number;
   useFilters?: boolean;
 }
 
@@ -27,9 +28,12 @@ export default function ProductGrid({
   products, 
   linkText, 
   hideHeader = false,
-  columns = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+  columns = "grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+  initialVisible = 4,
   useFilters = false
 }: ProductGridProps) {
+  const [showAll, setShowAll] = React.useState(false);
+  const initialCount = initialVisible;
   const { searchQuery, selectedCategory, selectedBrand, selectedTag, sortBy } = useProductContext();
   const { addToCart } = useCart();
 
@@ -88,8 +92,9 @@ export default function ProductGrid({
         )}
 
         {filteredProducts.length > 0 ? (
-          <div className={`grid ${columns} gap-8`}>
-            {filteredProducts.map((product) => (
+          <>
+            <div className={`grid ${columns} gap-8`}>
+              {(showAll ? filteredProducts : filteredProducts.slice(0, initialCount)).map((product) => (
               <div key={product.id} className="group relative">
                 <Link to={`/product/${product.id}`} className="aspect-[4/5] bg-gray-50 mb-4 overflow-hidden block relative rounded-lg">
                   <img
@@ -106,15 +111,27 @@ export default function ProductGrid({
                   </button>
                 </Link>
 
-                <div className=\"flex flex-col gap-1 px-1\">
-                  <h3 className=\"text-xs md:text-sm font-medium uppercase tracking-widest text-[#212529] line-clamp-2\">
-                    <Link to={`/product/${product.id}`} className=\"hover:text-gray-500\">{product.name}</Link>
+                <div className="flex flex-col gap-1 px-1">
+                  <h3 className="text-xs md:text-sm font-medium uppercase tracking-widest text-[#212529] line-clamp-2">
+                    <Link to={`/product/${product.id}`} className="hover:text-gray-500">{product.name}</Link>
                   </h3>
-                  <span className=\"text-xs md:text-sm font-bold text-[#72aec8]\">{product.price}</span>
+                  <span className="text-xs md:text-sm font-bold text-[#72aec8]">{product.price}</span>
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+
+            {filteredProducts.length > initialCount && (
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setShowAll(prev => !prev)}
+                  className="inline-block px-6 py-3 bg-black text-white uppercase text-xs font-bold rounded-md hover:bg-gray-800 transition-colors"
+                >
+                  {showAll ? 'Ver menos' : `Ver mais (${filteredProducts.length - initialCount})`}
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-20">
             <h3 className="text-xl font-light text-gray-400 uppercase tracking-widest">Nenhum produto encontrado</h3>

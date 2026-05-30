@@ -29,16 +29,16 @@ export default function Cart() {
           </div>
         ) : (
           <>
-            <div className=\"grid grid-cols-1 sm:grid-cols-4 gap-4 md:gap-8 border-b border-gray-100 pb-6 md:pb-10 mb-6 md:mb-10 text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[#212529]\">
-              <div className=\"sm:col-span-2\">Produto</div>
-              <div className=\"text-center\">Quantidade</div>
-              <div className=\"text-right hidden sm:block\">Subtotal</div>
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 md:gap-8 border-b border-gray-100 pb-6 md:pb-10 mb-6 md:mb-10 text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-[#212529]\">
+              <div className="sm:col-span-2">Produto</div>
+              <div className="text-center">Quantidade</div>
+              <div className="text-right hidden sm:block">Subtotal</div>
             </div>
 
-            <div className=\"space-y-6 md:space-y-12\">
+            <div className="space-y-6 md:space-y-12">
               {cartItems.map((item) => (
-                <div key={`${item.id}-${item.color}-${item.size}`} className=\"grid grid-cols-1 sm:grid-cols-4 gap-4 md:gap-8 items-start sm:items-center border-b border-gray-50 pb-6 md:pb-12\">
-                  <div className=\"col-span-1 sm:col-span-2 flex items-start sm:items-center gap-3 md:gap-8\">
+                <div key={`${item.id}-${item.color}-${item.size}`} className="grid grid-cols-1 sm:grid-cols-4 gap-4 md:gap-8 items-start sm:items-center border-b border-gray-50 pb-6 md:pb-12">
+                  <div className="col-span-1 sm:col-span-2 flex items-start sm:items-center gap-3 md:gap-8">
                     <Link to={`/product/${item.id}`} className="w-16 h-20 md:w-24 md:h-32 bg-[#f1f1f1] p-2 md:p-4 flex items-center justify-center shrink-0 hover:bg-[#e1e1e1] transition-colors rounded">
                       <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
                     </Link>

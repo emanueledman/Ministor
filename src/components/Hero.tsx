@@ -16,7 +16,7 @@ const slides = [
   },
   {
     id: "w1",
-    title: "O Truque Tecnológico Que Você Não Terá.",
+    title: "Produtos de qualidade.",
     subtitle: "Novos Relógios Inteligentes",
     image: "https://demo.templatesjungle.com/ministore/images/banner-image.png",
     linkText: "Comprar Produto"
@@ -25,7 +25,7 @@ const slides = [
 
 export default function Hero() {
   return (
-    <section id="billboard" className="relative w-full bg-light-blue pt-16 pb-12 md:pt-40 md:pb-20">
+    <section id="billboard" className="relative w-full bg-light-blue pt-12 pb-8 md:pt-28 md:pb-16">
       <Swiper
         modules={[Pagination, Autoplay, Navigation]}
         pagination={{ clickable: true }}
@@ -34,37 +34,44 @@ export default function Hero() {
           nextEl: '.swiper-arrow-next',
           prevEl: '.swiper-arrow-prev',
         }}
-        className="container mx-auto"
+        className="w-full"
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12">
-              <div className="w-full md:w-1/2">
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <h1 className="text-4xl md:text-7xl lg:text-8xl font-light tracking-tight text-black mb-6 md:mb-8 leading-[1.1] uppercase">
-                    {slide.title}
-                  </h1>
-                  <Link
-                    to={`/product/${slide.id}`}
-                    className="btn-medium btn-dark inline-block text-sm md:text-base"
+            <div className="container mx-auto px-4">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12">
+                <div className="w-full md:w-1/2">
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className="relative z-10 bg-white/95 p-4 rounded-lg md:bg-transparent md:p-0"
                   >
-                    {slide.linkText}
-                  </Link>
-                </motion.div>
-              </div>
-              <div className="w-full md:w-5/12 flex items-center justify-center">
-                 <motion.img 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.8 }}
-                  src={slide.image} 
-                  alt={slide.title}
-                  className="max-h-[250px] md:max-h-[400px] lg:max-h-[500px] w-full object-contain drop-shadow-2xl"
-                 />
+                    <h1 className="text-3xl md:text-6xl lg:text-7xl font-light tracking-tight text-black mb-4 md:mb-6 leading-[1.1] uppercase text-center md:text-left">
+                      {slide.title}
+                    </h1>
+
+                    <div className="mt-3 md:mt-0">
+                      <Link
+                        to={`/product/${slide.id}`}
+                        className="btn-medium btn-dark inline-block text-sm md:text-base w-full md:w-auto text-center"
+                      >
+                        {slide.linkText}
+                      </Link>
+                    </div>
+                  </motion.div>
+                </div>
+
+                <div className="w-full md:w-5/12 flex items-center justify-center mt-6 md:mt-0 relative">
+                  <motion.img 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.8 }}
+                    src={slide.image} 
+                    alt={slide.title}
+                    className="max-h-[160px] md:max-h-[320px] lg:max-h-[420px] w-full object-contain drop-shadow-2xl relative z-0"
+                  />
+                </div>
               </div>
             </div>
           </SwiperSlide>

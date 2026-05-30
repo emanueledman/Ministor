@@ -159,6 +159,9 @@ export default function Checkout() {
     );
   }
 
+  return (
+    <div className="pt-12 md:pt-32 pb-12 md:pb-24 min-h-screen bg-gray-50">
+
       {/* Page Header */}
       <section className="bg-[#edf1f3] py-12 md:py-20">
         <div className="container mx-auto px-4 text-center">

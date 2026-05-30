@@ -28,7 +28,7 @@ export default function Home() {
           title="Telemóveis" 
           products={mobileProducts} 
           linkText="Ver Todos" 
-          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          columns="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         />
       </section>
       
@@ -37,7 +37,7 @@ export default function Home() {
           title="Computadores" 
           products={computerProducts} 
           linkText="Ver Todos" 
-          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          columns="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         />
       </section>
 
@@ -46,7 +46,7 @@ export default function Home() {
           title="Relógios Inteligentes" 
           products={watchProducts} 
           linkText="Ver Todos" 
-          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          columns="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         />
       </section>
 
@@ -55,7 +55,7 @@ export default function Home() {
           title="Material Informático" 
           products={itProducts} 
           linkText="Ver Todos" 
-          columns="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+          columns="grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         />
       </section>
       

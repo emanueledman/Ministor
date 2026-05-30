@@ -42,8 +42,14 @@ async function startServer() {
     try {
       const { message, history, userId } = req.body;
       
+      // Sanitize history to match SDK expectation (role and parts only)
+      const sanitizedHistory = history?.map((msg: any) => ({
+        role: msg.role === 'model' ? 'model' : 'user',
+        parts: msg.parts.map((part: any) => ({ text: part.text }))
+      })) || [];
+
       const chat = ai.chats.create({
-        model: "gemini-3.5-flash",
+        model: "gemini-flash-latest",
         config: {
           systemInstruction: `Você é o assistente virtual inteligente da 'Ministore'. 
           Sua missão é ajudar clientes com:
@@ -69,10 +75,10 @@ async function startServer() {
           - Se o utilizador pedir para fazer uma fatura de compra real, explique que ele deve adicionar produtos ao carrinho e finalizar a compra.
           - Se você não souber algo, direcione para o suporte humano: "Podes falar com a nossa equipa técnica pelo WhatsApp no rodapé do site".`,
         },
-        history: history || [],
+        history: sanitizedHistory,
       });
 
-      const response = await chat.sendMessage({ message });
+      const response = await chat.sendMessage(message);
       const text = response.text;
 
       // Log to Firestore for learning (pattern analysis)

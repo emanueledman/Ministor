@@ -8,8 +8,12 @@ service cloud.firestore {
       allow create: if request.resource.data.userId == 'guest';
     }
     match /chat_logs/{logId} {
-      allow create: if true; // Chatbot needs to log questions
-      allow read: if request.auth != null; // Admin-like access (simplified here)
+      allow create: if true; 
+      allow read: if true; // Allow reading logs for pattern analysis (auto-learning)
+    }
+    match /dynamic_knowledge/{itemId} {
+      allow read: if true; // Knowledge base must be public
+      allow create: if true; // For auto-learning simulation
     }
   }
 }

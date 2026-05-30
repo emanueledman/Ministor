@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /documents/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Also allow guests to create if we want to support semi-anonymous checkouts
+      allow create: if request.resource.data.userId == 'guest';
+    }
+    match /chat_logs/{logId} {
+      allow create: if true; // Chatbot needs to log questions
+      allow read: if request.auth != null; // Admin-like access (simplified here)
+    }
+  }
+}

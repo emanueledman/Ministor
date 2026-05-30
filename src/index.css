@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;700&family=Lato:wght@300;400;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Lato", sans-serif;
+  --color-light-blue: #edf1f3;
+}
+
+@layer base {
+  body {
+    @apply font-body text-black overflow-x-hidden;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-medium uppercase tracking-widest;
+  }
+}
+
+/* Custom mapping for Bootstrap-like classes used in user's HTML */
+@layer components {
+  .container { @apply max-w-7xl mx-auto px-4; }
+  .row { @apply flex flex-wrap -mx-4; }
+  .display-2 { @apply text-6xl md:text-7xl font-light leading-tight; }
+  .display-7 { @apply text-4xl font-light; }
+  .padding-large { @apply py-20 md:py-24; }
+  .padding-xlarge { @apply py-32 md:py-40; }
+  .btn-medium { @apply px-8 py-3 text-sm font-bold tracking-widest uppercase inline-block transition-all; }
+  .btn-dark { @apply bg-black text-white hover:bg-gray-800; }
+  .btn-rounded-none { @apply rounded-none; }
+}
+
+/* User Provided: Magnific Popup Css */
+.mfp-bg {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1042;
+  overflow: hidden;
+  position: fixed;
+  background: #0b0b0b;
+  opacity: 0.8; }
+
+.mfp-wrap {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1043;
+  position: fixed;
+  outline: none !important;
+  -webkit-backface-visibility: hidden; }
+
+.mfp-container {
+  text-align: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  padding: 0 8px;
+  box-sizing: border-box; }
+
+.mfp-container:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle; }
+
+.mfp-content {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 auto;
+  text-align: left;
+  z-index: 1045; }
+
+.mfp-close {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  text-decoration: none;
+  text-align: center;
+  opacity: 0.65;
+  padding: 0 0 18px 10px;
+  color: #FFF;
+  font-style: normal;
+  font-size: 28px;
+  font-family: Arial, Baskerville, monospace; }
+
+/* User Provided: Jarallax */
+.jarallax {
+  position: relative;
+  z-index: 0;
+  min-height: 350px;
+}
+
+.jarallax > .jarallax-img {
+  position: absolute;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Shop Swiper Styles */
+.swiper-pagination-bullet { width: 10px; height: 10px; background: #000; opacity: 0.2; }
+.swiper-pagination-bullet-active { opacity: 1; border-radius: 5px; }

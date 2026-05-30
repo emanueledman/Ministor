@@ -1,0 +1,6 @@
+{
+  "name": "Ministore",
+  "description": "E-commerce Ministore com Assistente Virtual inteligente, suporte a voz, geração de faturas PDF automáticas e integração com WhatsApp.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

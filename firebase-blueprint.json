@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Document": {
+      "title": "Document",
+      "description": "Electronic document like invoice, receipt or prescription",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "User UID who owns this document" },
+        "type": { "type": "string", "enum": ["invoice", "receipt", "prescription"], "description": "Type of document" },
+        "number": { "type": "string", "description": "Document sequential number" },
+        "customerName": { "type": "string" },
+        "customerEmail": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "object" } },
+        "total": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "pdfUrl": { "type": "string", "description": "Optional link to blob or stored PDF" }
+      },
+      "required": ["userId", "type", "number", "items", "total", "createdAt"]
+    },
+    "ChatLog": {
+      "title": "ChatLog",
+      "description": "Logs of user interactions with the chatbot for learning",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "question": { "type": "string" },
+        "answer": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "category": { "type": "string" }
+      },
+      "required": ["question", "answer", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/documents/{documentId}": {
+      "schema": "Document",
+      "description": "Store issued invoices and receipts"
+    },
+    "/chat_logs/{logId}": {
+      "schema": "ChatLog",
+      "description": "Store chat history for FAQ generation"
+    },
+    "/dynamic_knowledge/{knowledgeId}": {
+      "schema": "ChatLog",
+      "description": "Store learned question-answer pairs"
+    }
+  }
+}

@@ -533,7 +533,40 @@ export default function VirtualAssistant() {
                       ? 'bg-black text-white rounded-tr-none shadow-lg' 
                       : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-sm'
                   }`}>
-                    <div className="whitespace-pre-wrap">{msg.parts[0].text}</div>
+                    {/* Render text with basic bold formatting substitute */}
+                    <div className="whitespace-pre-wrap">
+                      {msg.parts[0].text.split(/(\*\*.*?\*\*)/).map((part, index) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={index}>{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                      })}
+                    </div>
+
+                    {/* Automatic Product Card Detection */}
+                    {msg.role === 'model' && (
+                      <div className="flex flex-col gap-2 mt-2">
+                        {products.filter(p => msg.parts[0].text.toLowerCase().includes(p.name.toLowerCase())).slice(0, 1).map(p => (
+                          <div key={p.id} className="bg-gray-50 border border-gray-100 rounded-xl p-2 flex items-center gap-3">
+                            <img src={p.image} alt={p.name} className="w-12 h-12 object-cover rounded-md" />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-bold text-[10px] truncate">{p.name}</p>
+                              <p className="text-[10px] text-[#72aec8] font-bold">{p.price}</p>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                // Add to cart logic can be added here
+                                alert(`${p.name} adicionado ao carrinho!`);
+                              }}
+                              className="p-1.5 bg-black text-white rounded-full"
+                            >
+                              <Send size={10} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {msg.isLearned && (
                       <div className="flex items-center gap-1 mt-1 p-1 bg-blue-50/50 rounded-md text-[9px] text-blue-600 font-bold uppercase tracking-tight">
                         <Sparkles size={10} />

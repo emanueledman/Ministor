@@ -17,7 +17,6 @@ import Cart from './pages/Cart';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider } from './context/CartContext';
 import { FirebaseProvider } from './context/FirebaseContext';
-import VirtualAssistant from './components/VirtualAssistant';
 import DocumentHistory from './pages/DocumentHistory';
 
 export default function App() {
@@ -42,7 +41,6 @@ export default function App() {
             </Routes>
           </main>
           <Footer />
-          <VirtualAssistant />
         </div>
         </CartProvider>
       </ProductProvider>

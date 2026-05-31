@@ -6,6 +6,9 @@ import dotenv from "dotenv";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import fs from "fs";
+import { randomUUID } from "crypto";
+import { generateDocumentPDF } from "./src/lib/pdfGenerator";
+import { products } from "./src/data/products";
 
 dotenv.config();
 
@@ -61,15 +64,20 @@ async function getAIResponse(message: string, history: any[]) {
     history: history,
   });
 
-  const response = await chat.sendMessage(message);
+  const response = await chat.sendMessage({ message });
   return response.text;
 }
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+  const invoicesDir = path.join(process.cwd(), 'invoices');
+
+  fs.mkdirSync(invoicesDir, { recursive: true });
+  app.set('trust proxy', true);
 
   app.use(express.json());
+  app.use('/invoices', express.static(invoicesDir));
 
   // --- NOVO: WEBHOOK PARA WHATSAPP (WAHA) ---
   app.post("/api/waha/webhook", async (req, res) => {
@@ -145,6 +153,101 @@ async function startServer() {
     } catch (error: any) {
       console.error("Gemini Error:", error);
       res.status(500).json({ error: "Erro ao processar a sua mensagem." });
+    }
+  });
+
+  app.post('/api/invoices/proforma', async (req, res) => {
+    try {
+      const { name, email, nif, phone, productName, documentType } = req.body ?? {};
+
+      if (!name || !email || !nif || !productName) {
+        return res.status(400).json({
+          error: 'Campos obrigatórios: name, email, nif, productName'
+        });
+      }
+
+      const normalizedProductName = String(productName).toLowerCase().trim();
+      const matchedProduct = products.find(product =>
+        product.name.toLowerCase() === normalizedProductName ||
+        product.name.toLowerCase().includes(normalizedProductName)
+      );
+
+      if (!matchedProduct) {
+        return res.status(404).json({
+          error: `Produto não encontrado: ${productName}`
+        });
+      }
+
+      const resolvedType = documentType || 'Fatura Proforma';
+      const documentNumber = `PRF-${Math.floor(1000 + Math.random() * 9000)}-${new Date().getFullYear()}`;
+      const safeName = String(name)
+        .trim()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-zA-Z0-9_-]/g, '');
+      const fileName = `${documentNumber}_${safeName || randomUUID()}.pdf`;
+      const filePath = path.join(invoicesDir, fileName);
+
+      const pdf = generateDocumentPDF({
+        type: resolvedType,
+        number: documentNumber,
+        date: new Date().toLocaleDateString('pt-BR'),
+        customer: {
+          name,
+          email,
+          phone: phone || '(+244) 9XX XXX XXX',
+          nif
+        },
+        items: [{
+          name: matchedProduct.name,
+          quantity: 1,
+          price: matchedProduct.price,
+          total: matchedProduct.numericPrice
+        }],
+        total: matchedProduct.numericPrice
+      });
+
+      const pdfBuffer = Buffer.from(pdf.output('arraybuffer'));
+      fs.writeFileSync(filePath, pdfBuffer);
+
+      if (db) {
+        try {
+          await addDoc(collection(db, 'documents'), {
+            userId: 'botpress',
+            type: resolvedType,
+            number: documentNumber,
+            customerName: name,
+            customerEmail: email,
+            customerPhone: phone || '(+244) 9XX XXX XXX',
+            customerNif: nif,
+            items: [{
+              name: matchedProduct.name,
+              quantity: 1,
+              price: matchedProduct.price,
+              total: matchedProduct.numericPrice
+            }],
+            total: matchedProduct.numericPrice,
+            createdAt: new Date().toISOString()
+          });
+        } catch (logErr) {
+          console.error('Error saving invoice document:', logErr);
+        }
+      }
+
+      const baseUrl = process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`;
+      const pdfUrl = `${baseUrl}/invoices/${encodeURIComponent(fileName)}`;
+
+      return res.json({
+        pdf_url: pdfUrl,
+        document_number: documentNumber,
+        type: resolvedType,
+        customer_name: name,
+        product_name: matchedProduct.name
+      });
+    } catch (error) {
+      console.error('Invoice generation error:', error);
+      return res.status(500).json({
+        error: 'Erro ao gerar a fatura.'
+      });
     }
   });
 

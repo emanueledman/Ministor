@@ -156,53 +156,110 @@ async function startServer() {
     }
   });
 
-  app.post('/api/invoices/proforma', async (req, res) => {
+  // Smart endpoint: uses Gemini AI to extract fields from any free-form user message
+  app.post('/api/invoices/from-text', async (req, res) => {
+    try {
+      const { text } = req.body ?? {};
+      if (!text || String(text).trim().length < 5) {
+        return res.status(400).json({ error: 'Texto vazio ou muito curto para processar.' });
+      }
+
+      const catalogList = products.map(p => `- ${p.name}`).join('\n');
+
+      // Ask Gemini to extract structured data from the raw user message
+      const extractionPrompt = `Extrai os dados de faturação da mensagem abaixo e responde APENAS com um JSON válido, sem markdown, sem explicações.
+
+Catálogo de produtos disponíveis:
+${catalogList}
+
+Regras:
+- "name": nome completo da pessoa (string ou null)
+- "email": endereço de email (string ou null)
+- "nif": número de identificação fiscal, pode conter letras e números (string ou null)
+- "phone": número de telefone (string ou null)
+- "productName": nome EXATO do produto do catálogo acima que mais se aproxima do mencionado (string ou null)
+
+Mensagem do utilizador:
+"${String(text).replace(/"/g, "'")}"
+
+Responde APENAS com JSON no formato: {"name":..., "email":..., "nif":..., "phone":..., "productName":...}`;
+
+      const geminiResponse = await ai.models.generateContent({
+        model: 'gemini-flash-latest',
+        contents: [{ role: 'user', parts: [{ text: extractionPrompt }] }]
+      });
+
+      const rawJson = geminiResponse.text?.trim().replace(/```json|```/g, '').trim() ?? '{}';
+      let extracted: any = {};
+      try {
+        extracted = JSON.parse(rawJson);
+      } catch {
+        return res.status(500).json({ error: 'Gemini retornou dados inválidos. Tente novamente.' });
+      }
+
+      const { name, email, nif, phone, productName } = extracted;
+
+      // Validate required fields
+      const missing: string[] = [];
+      if (!name)        missing.push('nome');
+      if (!email)       missing.push('email');
+      if (!nif)         missing.push('NIF');
+      if (!productName) missing.push('produto do catálogo');
+
+      if (missing.length > 0) {
+        return res.status(400).json({
+          error: `Não consegui identificar: ${missing.join(', ')}. Por favor inclua todos os dados.`,
+          parsed: extracted
+        });
+      }
+
+      // All good — pass to shared invoice handler
+      req.body = {
+        name, email, nif,
+        phone: phone || '',
+        productName,
+        documentType: req.body.documentType || 'Fatura Proforma'
+      };
+    } catch (parseErr: any) {
+      return res.status(500).json({ error: 'Erro ao analisar os dados fornecidos.', details: parseErr?.message });
+    }
+
+    // Falls through to the proforma logic below via shared handler
+    return proformaHandler(req, res);
+  });
+
+  // Shared invoice generation handler
+  async function proformaHandler(req: any, res: any) {
     try {
       const { name, email, nif, phone, productName, documentType } = req.body ?? {};
 
       if (!name || !email || !nif || !productName) {
-        return res.status(400).json({
-          error: 'Campos obrigatórios: name, email, nif, productName'
-        });
+        return res.status(400).json({ error: 'Campos obrigatórios: name, email, nif, productName' });
       }
 
       const normalizedProductName = String(productName).toLowerCase().trim();
       const matchedProduct = products.find(product =>
         product.name.toLowerCase() === normalizedProductName ||
-        product.name.toLowerCase().includes(normalizedProductName)
+        product.name.toLowerCase().includes(normalizedProductName) ||
+        normalizedProductName.includes(product.name.toLowerCase())
       );
 
       if (!matchedProduct) {
-        return res.status(404).json({
-          error: `Produto não encontrado: ${productName}`
-        });
+        return res.status(404).json({ error: `Produto não encontrado: ${productName}` });
       }
 
       const resolvedType = documentType || 'Fatura Proforma';
       const documentNumber = `PRF-${Math.floor(1000 + Math.random() * 9000)}-${new Date().getFullYear()}`;
-      const safeName = String(name)
-        .trim()
-        .replace(/\s+/g, '_')
-        .replace(/[^a-zA-Z0-9_-]/g, '');
+      const safeName = String(name).trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
       const fileName = `${documentNumber}_${safeName || randomUUID()}.pdf`;
-      const filePath = path.join(invoicesDir, fileName);
+      const filePath = path.join(process.cwd(), 'invoices', fileName);
 
       const pdf = generateDocumentPDF({
         type: resolvedType,
         number: documentNumber,
         date: new Date().toLocaleDateString('pt-BR'),
-        customer: {
-          name,
-          email,
-          phone: phone || '(+244) 9XX XXX XXX',
-          nif
-        },
-        items: [{
-          name: matchedProduct.name,
-          quantity: 1,
-          price: matchedProduct.price,
-          total: matchedProduct.numericPrice
-        }],
+        customer: { name, email, phone: phone || '(+244) 9XX XXX XXX', nif },
+        items: [{ name: matchedProduct.name, quantity: 1, price: matchedProduct.price, total: matchedProduct.numericPrice }],
         total: matchedProduct.numericPrice
       });
 
@@ -211,46 +268,31 @@ async function startServer() {
 
       if (db) {
         try {
+          const { addDoc, collection } = await import('firebase/firestore');
           await addDoc(collection(db, 'documents'), {
-            userId: 'botpress',
-            type: resolvedType,
-            number: documentNumber,
-            customerName: name,
-            customerEmail: email,
-            customerPhone: phone || '(+244) 9XX XXX XXX',
-            customerNif: nif,
-            items: [{
-              name: matchedProduct.name,
-              quantity: 1,
-              price: matchedProduct.price,
-              total: matchedProduct.numericPrice
-            }],
-            total: matchedProduct.numericPrice,
-            createdAt: new Date().toISOString()
+            userId: 'botpress', type: resolvedType, number: documentNumber,
+            customerName: name, customerEmail: email, customerPhone: phone || '', customerNif: nif,
+            items: [{ name: matchedProduct.name, quantity: 1, price: matchedProduct.price, total: matchedProduct.numericPrice }],
+            total: matchedProduct.numericPrice, createdAt: new Date().toISOString()
           });
-        } catch (logErr) {
-          console.error('Error saving invoice document:', logErr);
-        }
+        } catch (logErr) { console.error('Error saving to Firebase:', logErr); }
       }
 
       const baseUrl = process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`;
       const pdfUrl = `${baseUrl}/invoices/${encodeURIComponent(fileName)}`;
 
       return res.json({
-        pdf_url: pdfUrl,
-        document_number: documentNumber,
-        type: resolvedType,
-        customer_name: name,
-        product_name: matchedProduct.name
+        pdf_url: pdfUrl, document_number: documentNumber,
+        type: resolvedType, customer_name: name, product_name: matchedProduct.name
       });
     } catch (error: any) {
       console.error('Invoice generation error:', error);
-      return res.status(500).json({
-        error: 'Erro ao gerar a fatura.',
-        details: error?.message || String(error)
-      });
+      return res.status(500).json({ error: 'Erro ao gerar a fatura.', details: error?.message || String(error) });
     }
-  });
+  }
+
+  // Old endpoint kept for backwards compatibility — delegates to shared handler
+  app.post('/api/invoices/proforma', (req, res) => proformaHandler(req, res));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

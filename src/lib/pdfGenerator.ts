@@ -54,7 +54,19 @@ export const generateDocumentPDF = (data: DocData) => {
     `${item.total.toLocaleString()} Kz`
   ]);
 
-  autoTable(doc, {
+  const callAutoTable = (docInstance: any, options: any) => {
+    if (typeof autoTable === 'function') {
+      autoTable(docInstance, options);
+    } else if (autoTable && typeof (autoTable as any).default === 'function') {
+      (autoTable as any).default(docInstance, options);
+    } else if (typeof docInstance.autoTable === 'function') {
+      docInstance.autoTable(options);
+    } else {
+      throw new Error("Could not find autoTable function or plugin on jsPDF instance.");
+    }
+  };
+
+  callAutoTable(doc, {
     startY: 75,
     head: [['Produto', 'Qtd', 'Preço Unit.', 'Subtotal']],
     body: tableRows,

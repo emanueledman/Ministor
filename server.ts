@@ -70,7 +70,7 @@ async function getAIResponse(message: string, history: any[]) {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   const invoicesDir = path.join(process.cwd(), 'invoices');
 
   fs.mkdirSync(invoicesDir, { recursive: true });
@@ -243,10 +243,11 @@ async function startServer() {
         customer_name: name,
         product_name: matchedProduct.name
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Invoice generation error:', error);
       return res.status(500).json({
-        error: 'Erro ao gerar a fatura.'
+        error: 'Erro ao gerar a fatura.',
+        details: error?.message || String(error)
       });
     }
   });
